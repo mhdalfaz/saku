@@ -13,6 +13,24 @@
     <link href="{{ asset('vendor/bladewind/css/bladewind-ui.min.css') }}" rel="stylesheet" />
     <script src="{{ asset('vendor/bladewind/js/helpers.js') }}"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
+
+    <script>
+        // cek token secepatnya sebelum konten ditampilkan
+        (function () {
+            try {
+                var token = localStorage.getItem('token');
+                var path = window.location.pathname;
+                if (token && (path === '/login' || path === '/register')) {
+                    window.location.href = '/home';
+                    return;
+                }
+                // jika mau redirect kalau tidak ada token, bisa tambahkan:
+                // if (!token && protectedRoute) { window.location.href = '/login'; return; }
+            } catch (e) {
+                // ignore
+            }
+        })();
+    </script>
 </head>
 
 <body class="bg-gray-100 text-gray-900">
@@ -31,8 +49,28 @@
     </div>
 
     {{-- Mobile Bottom Nav --}}
-    <x-mobile-nav class="md:hidden" />
+    <div id="mobileNav" class="hidden md:hidden">
+        <x-mobile-nav />
+    </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = localStorage.getItem("token");
+            console.log("Token:", token);
+
+            const mobileNav = document.getElementById("mobileNav");
+
+            if (token && mobileNav) {
+                mobileNav.classList.remove("hidden");
+            }
+
+            // if route is /login or /register, redirect to /home if token exists
+            const path = window.location.pathname;
+            if (token && (path === "/login" || path === "/register")) {
+                window.location.href = "/home";
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -1,11 +1,13 @@
 <x-layouts.app title="Home">
 
-    <h1 class="text-2xl font-bold mb-4">Home</h1>
+    <script>
+        const token = localStorage.getItem('token');
 
-    <x-bladewind.card>
-        <div class="text-gray-700">
-            Selamat datang di aplikasi Saku!
-        </div>
-    </x-bladewind.card>
+        if (!token) {
+            window.location.href = "/login";
+        }
+    </script>
+
+    <h1 class="text-2xl font-bold">Home</h1>
 
 </x-layouts.app>
