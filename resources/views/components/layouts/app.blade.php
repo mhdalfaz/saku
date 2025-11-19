@@ -15,7 +15,6 @@
     <script src="//unpkg.com/alpinejs" defer></script>
 
     <script>
-        // cek token secepatnya sebelum konten ditampilkan
         (function () {
             try {
                 var token = localStorage.getItem('token');
@@ -24,8 +23,10 @@
                     window.location.href = '/home';
                     return;
                 }
-                // jika mau redirect kalau tidak ada token, bisa tambahkan:
-                // if (!token && protectedRoute) { window.location.href = '/login'; return; }
+
+                if (!token && (path !== '/login' && path !== '/register')) {
+                    window.location.href = "/login";
+                }
             } catch (e) {
                 // ignore
             }
@@ -62,12 +63,6 @@
 
             if (token && mobileNav) {
                 mobileNav.classList.remove("hidden");
-            }
-
-            // if route is /login or /register, redirect to /home if token exists
-            const path = window.location.pathname;
-            if (token && (path === "/login" || path === "/register")) {
-                window.location.href = "/home";
             }
         });
     </script>
