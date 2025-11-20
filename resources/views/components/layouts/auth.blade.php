@@ -16,24 +16,12 @@
 </head>
 
 <body class="bg-gray-100 text-gray-900">
-
-    {{-- Desktop Navbar --}}
-    <div id="desktopNav">
-        <x-navbar />
-    </div>
-
     <div class="flex w-full">
         {{-- Content --}}
         <main class="flex-1 p-6">
             {{ $slot }}
         </main>
     </div>
-
-    {{-- Mobile Bottom Nav --}}
-    <div id="mobileNav" class="md:hidden">
-        <x-mobile-nav />
-    </div>
-
 </body>
 
 </html>
