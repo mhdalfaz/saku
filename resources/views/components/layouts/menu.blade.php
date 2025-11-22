@@ -31,11 +31,8 @@
         </main>
     </div>
 
-    {{-- Mobile Bottom Nav --}}
-    <div id="mobileNav" class="md:hidden">
-        <x-mobile-nav />
-    </div>
-
+    {{-- Modal --}}
+    @yield('modals')
 </body>
 
 </html>
