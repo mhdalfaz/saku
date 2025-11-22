@@ -6,7 +6,7 @@
     </a>
 
     {{-- Add --}}
-    <a href="#" class="flex-1 flex flex-col items-center text-gray-700">
+    <a href="/choose" class="flex-1 flex flex-col items-center text-gray-700">
         <div class="bg-black text-white w-12 h-12 rounded-full flex items-center justify-center shadow-md -mt-6">
             <x-bladewind.icon name="plus" class="w-6 h-6 text-white" />
         </div>

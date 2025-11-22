@@ -1,40 +1,35 @@
 <x-layouts.app title="Pengaturan">
 
-    <div class="max-w-xl mx-auto space-y-6">
+    {{-- PROFILE --}}
+    <x-bladewind.card>
+        <div class="flex flex-col items-center gap-3">
 
-        {{-- PROFILE --}}
-        <x-bladewind.card>
-            <div class="flex flex-col items-center gap-3">
+            <div id="profileAvatar" class="w-14 h-14 rounded-full bg-gray-200 animate-pulse"></div>
 
-                <div id="profileAvatar" class="w-14 h-14 rounded-full bg-gray-200 animate-pulse"></div>
-
-                <div id="profileInfo" class="text-center">
-                    <div class="h-4 bg-gray-200 rounded w-32 mb-2 mx-auto animate-pulse"></div>
-                    <div class="h-3 bg-gray-200 rounded w-24 mx-auto animate-pulse"></div>
-                </div>
-
+            <div id="profileInfo" class="text-center">
+                <div class="h-4 bg-gray-200 rounded w-32 mb-2 mx-auto animate-pulse"></div>
+                <div class="h-3 bg-gray-200 rounded w-24 mx-auto animate-pulse"></div>
             </div>
-        </x-bladewind.card>
+
+        </div>
+    </x-bladewind.card>
 
 
-        {{-- MENU LIST --}}
-        <x-bladewind.card>
-            <x-bladewind.listview>
-                <x-bladewind.listview.item>
-                    <div class="text-gray-500 text-sm text-center w-full">
-                        Belum ada pengaturan.
-                    </div>
-                </x-bladewind.listview.item>
-            </x-bladewind.listview>
-        </x-bladewind.card>
+    {{-- MENU LIST --}}
+    <x-bladewind.card>
+        <x-bladewind.listview>
+            <x-bladewind.listview.item>
+                <div class="text-gray-500 text-sm text-center w-full">
+                    Belum ada pengaturan.
+                </div>
+            </x-bladewind.listview.item>
+        </x-bladewind.listview>
+    </x-bladewind.card>
 
-        {{-- LOGOUT --}}
-        <x-bladewind.button name="btnLogout" color="red" class="w-full" onclick="logout()">
-            Logout
-        </x-bladewind.button>
-
-    </div>
-
+    {{-- LOGOUT --}}
+    <x-bladewind.button name="btnLogout" color="red" class="w-full" onclick="logout()">
+        Logout
+    </x-bladewind.button>
 
     <script>
         document.addEventListener("DOMContentLoaded", loadProfile);

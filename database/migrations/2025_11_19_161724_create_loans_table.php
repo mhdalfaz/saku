@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->foreignId('borrower_id')->constrained()->cascadeOnDelete();
             $table->enum('status', ['ongoing', 'paid'])->default('ongoing');
             $table->bigInteger('total_amount')->default(0);
+            $table->date('date');
             $table->date('due_date')->nullable();
             $table->text('description')->nullable();
             $table->softDeletes();

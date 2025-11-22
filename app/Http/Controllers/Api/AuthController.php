@@ -37,7 +37,7 @@ class AuthController extends ApiController
             'user' => $user,
             'token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60 * 24
+            'expires_in' => auth('api')->factory()->getTTL() * 60
         ], "Registrasi berhasil", 201);
     }
 
@@ -59,7 +59,7 @@ class AuthController extends ApiController
         return $this->success([
             'token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60 * 24
+            'expires_in' => auth('api')->factory()->getTTL() * 60
         ], "Login berhasil");
     }
 
@@ -100,7 +100,7 @@ class AuthController extends ApiController
             return $this->success([
                 'token' => $newToken,
                 'token_type' => 'bearer',
-                'expires_in' => auth('api')->factory()->getTTL() * 60 * 24
+                'expires_in' => auth('api')->factory()->getTTL() * 60
             ], "Token refreshed");
 
         } catch (JWTException $e) {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LoanController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,6 +15,18 @@ Route::get('/home', function () {
     return view('pages.home');
 })->name('home');
 
+Route::get('/choose', function () {
+    return view('pages.choose');
+})->name('choose');
+
 Route::get('/settings', function () {
     return view('pages.settings.index');
 })->name('settings');
+
+// loans group
+Route::prefix('loans')->name('loans.')->group(function () {
+    Route::get('/create', [LoanController::class, 'createPage'])->name('create.page');
+    Route::get('/', function() {
+        return view('pages.loans.list');
+    })->name('list.page');
+});

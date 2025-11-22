@@ -2,10 +2,8 @@
     <div class="text-xl font-semibold">Saku</div>
 
     <div class="flex items-center gap-4">
-        <a href="#" class="text-sm text-gray-700 hover:text-black">Dashboard</a>
-
-        <x-bladewind.button size="tiny" class="!py-1">
-            Logout
-        </x-bladewind.button>
+        <a href="/home" class="text-sm text-gray-700 hover:text-black">Home</a>
+        <a href="/choose" class="text-sm text-gray-700 hover:text-black">Buat baru</a>
+        <a href="/settings" class="text-sm text-gray-700 hover:text-black">Setting</a>
     </div>
 </nav>
