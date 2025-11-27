@@ -13,6 +13,9 @@
     <link href="{{ asset('vendor/bladewind/css/bladewind-ui.min.css') }}" rel="stylesheet" />
     <script src="{{ asset('vendor/bladewind/js/helpers.js') }}"></script>
     <script src="//unpkg.com/alpinejs" defer></script>
+    
+    {{-- Styles --}}
+    @stack('styles')
 </head>
 
 <body class="bg-gray-100 text-gray-900">
@@ -33,6 +36,9 @@
 
     {{-- Modal --}}
     @yield('modals')
+
+    {{-- Scripts --}}
+    @stack('scripts')
 </body>
 
 </html>

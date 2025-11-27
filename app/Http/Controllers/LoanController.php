@@ -13,4 +13,9 @@ class LoanController extends Controller
         $borrowers = Borrower::all();
         return view('pages.loans.create', compact('borrowers'));
     }
+
+    public function paymentPage($loanId)
+    {
+        return view('pages.loans.pay', compact('loanId'));
+    }
 }

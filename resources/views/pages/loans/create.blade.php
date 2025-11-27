@@ -22,7 +22,8 @@
         </x-bladewind::card>
 
         <x-bladewind::card class="mb-[70px]">
-            // upload files atau images
+            <x-bladewind::filepicker name="attachments" max_file_size="5mb" max_files="10" />
+            <p id="error-attachments" class="text-red-600 text-sm alert-error"></p>
         </x-bladewind::card>
 
         <div class="fixed bottom-0 left-0 w-full bg-white py-4 px-6 border-t shadow-md">
@@ -43,38 +44,42 @@
             const token = localStorage.getItem("token");
             if (!token) return window.location.href = "/login";
 
-            const data = {
-                borrower_id: form.borrower_id.value,
-                amount: parseInt(unformatIDR(form.amount.value)),
-                date: form.date.value,
-                note: form.note.value
-            };
+            const fd = new FormData();
+
+            fd.append("borrower_id", form.borrower_id.value);
+            fd.append("amount", parseInt(unformatIDR(form.amount.value)));
+            fd.append("date", form.date.value);
+            fd.append("note", form.note.value);
+
+            const allInputs = form.querySelectorAll('input[name="attachments"]');
+
+            allInputs.forEach(input => {
+                for (let i = 0; i < input.files.length; i++) {
+                    fd.append("attachments[]", input.files[i]);
+                }
+            });
 
             try {
                 const res = await fetch("/api/loans", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
                         "Authorization": "Bearer " + token
                     },
-                    body: JSON.stringify(data)
+                    body: fd
                 });
 
                 const json = await res.json();
 
                 if (!res.ok) {
-                    const errors = json.errors;
-
-                    // set new errors
-                    Object.keys(errors).forEach(field => {
-                        setBladewindInputError(field, errors[field][0]);
+                    Object.keys(json.errors).forEach(field => {
+                        const cleanField = field.replace(/\.\d+$/, "");
+                        setBladewindInputError(cleanField, json.errors[field][0]);
                     });
-
                     return;
                 }
 
                 alert("Pinjaman berhasil ditambahkan!");
-                form.reset();
+                window.location.reload();
 
             } catch (err) {
                 console.error(err);
@@ -82,41 +87,4 @@
             }
         });
     </script>
-
-    {{--
-    <script>
-        console.log("SCRIPT LOADED");
-        document.addEventListener('DOMContentLoaded', () => {
-            waitForSelect();
-        });
-
-        function waitForSelect() {
-            // kalau select belum siap, tunggu 100ms
-            if (!window.bladeWindSelects || !window.bladeWindSelects['borrowerSelect']) {
-                return setTimeout(waitForSelect, 100);
-            }
-
-            loadBorrowers();
-        }
-
-        function loadBorrowers() {
-            fetch('/api/borrowers', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem("token")
-                }
-            })
-                .then(response => response.json())
-                .then((d) => {
-                    console.log('logging borrowers data:');
-                    console.log(d.data);
-
-                    const bwSelect = window.bladeWindSelects['borrowerSelect'];
-
-                    bwSelect.populate(d.data);  // FIXED
-                })
-                .catch(error => console.error(error));
-        }
-    </script> --}}
 </x-layouts.menu>
