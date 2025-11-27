@@ -29,9 +29,7 @@
             if (!token) return window.location.href = "/login";
 
             const res = await fetch("/api/loans", {
-                headers: {
-                    "Authorization": "Bearer " + token
-                }
+                headers: { "Authorization": "Bearer " + token }
             });
 
             const json = await res.json();
@@ -46,6 +44,21 @@
         }
     }
 
+    function formatFullDate(dateString) {
+        const options = {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        };
+
+        return new Date(dateString).toLocaleDateString("id-ID", options);
+    }
+
+    function formatRupiah(number) {
+        return number.toLocaleString("id-ID");
+    }
+
     function renderLoans() {
         const filterText = filterInput.value.toLowerCase();
         const sortOrder = sortSelect.value;
@@ -56,22 +69,39 @@
         );
 
         // sort
-        filtered.sort((a, b) => {
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-            return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-        });
+        filtered.sort((a, b) =>
+            sortOrder === 'asc'
+                ? new Date(a.date) - new Date(b.date)
+                : new Date(b.date) - new Date(a.date)
+        );
 
         // render
-        loansContainer.innerHTML = filtered.map(l => `
-            <x-bladewind::card>
-                <div class="flex justify-between items-center">
-                    <div class="font-semibold">${l.borrower.name}</div>
-                    <div class="text-sm text-gray-500">${new Date(l.date).toLocaleDateString()}</div>
-                </div>
-                <div class="text-2xl font-semibold">Rp ${l.total_amount.toLocaleString()}</div>
-            </x-bladewind::card>
-        `).join('');
+        loansContainer.innerHTML = filtered.map(l => {
+            return `
+                <x-bladewind::card class="border rounded-md p-4 shadow-sm bg-white">
+                    <div class="flex justify-between items-start">
+                        <div class="flex flex-col gap-1">
+                            <div class="font-semibold text-lg">${l.borrower.name}</div>
+                            <div class="text-sm text-gray-500 mb-2">
+                                ${formatFullDate(l.date)}
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <x-bladewind::button size="tiny" onclick="window.location.href='/loans/${l.id}/pay'">Bayar</x-bladewind::button>
+                            <x-bladewind::button size="tiny" color="secondary" onclick="window.location.href='/loans/${l.id}'">Detail</x-bladewind::button>
+                        </div>
+                    </div>
+
+
+                    <div class="text-3xl font-bold mb-2">Rp ${formatRupiah(l.total_amount)}</div>
+
+                    <div class="text-sm text-green-600">Sudah dibayar: Rp ${formatRupiah(l.paid)}</div>
+                    <div class="text-sm text-red-600 mb-2">Sisa: Rp ${formatRupiah(l.remaining)}</div>
+
+                    <x-bladewind::progress-bar percentage="${l.percent}" color="green" />
+                </x-bladewind::card>
+            `;
+        }).join('');
 
         if (filtered.length === 0) {
             loansContainer.innerHTML = `<p class="text-gray-500">Tidak ada pinjaman.</p>`;

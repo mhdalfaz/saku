@@ -14,10 +14,13 @@ Route::middleware('jwt')->group(function () {
     Route::post('/refresh', [AuthController::class, 'refresh']);
 
     Route::get('/borrowers', [BorrowerController::class, 'getBorrowers']);
+    Route::post('/borrowers', [BorrowerController::class, 'create']);
 
     // make a group for loan routes
     Route::prefix('loans')->group(function () {
         Route::get('/', [LoanController::class, 'getLoans']);
         Route::post('/', [LoanController::class, 'create']);
+        Route::get('/{loan}', [LoanController::class, 'detail']);
+        Route::post('/{loan}/pay', [LoanController::class, 'pay']);
     });
 });

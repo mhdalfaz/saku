@@ -29,4 +29,8 @@ Route::prefix('loans')->name('loans.')->group(function () {
     Route::get('/', function() {
         return view('pages.loans.list');
     })->name('list.page');
+    Route::get('/{loan}', function() {
+        return view('pages.loans.detail');
+    })->name('payment.page');
+    Route::get('/{loan}/pay', [LoanController::class, 'paymentPage'])->name('payment.page');
 });

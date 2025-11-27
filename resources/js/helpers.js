@@ -1,15 +1,17 @@
 function formatIDR(value) {
-  // hilangkan semua selain angka
-  let numberString = value.replace(/[^\d]/g, "");
+  if (value === null || value === undefined) return "Rp 0";
 
-  // hilangkan nol di depan (kecuali jika angka memang "0")
-  numberString = numberString.replace(/^0+/, "");
+  let str = value.toString();
 
-  if (numberString.length === 0) return "";
+  let numberString = str.replace(/[^\d]/g, "");
 
-  let formatted = numberString.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  return "Rp " + formatted;
+  if (numberString === "") return "Rp 0";
+
+  let number = parseInt(numberString, 10);
+
+  return "Rp " + number.toLocaleString("id-ID");
 }
+
 
 function unformatIDR(formatted) {
   if (!formatted) return 0;
@@ -18,9 +20,6 @@ function unformatIDR(formatted) {
 
 function setBladewindInputError(fieldName, message) {
   const errorElement = document.getElementById(`error-${fieldName}`);
-
-  // reset error message 
-  // resetBladewindInputError();
 
   // set new error message
   if (errorElement) {
