@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Image extends Model
 {
@@ -21,7 +22,19 @@ class Image extends Model
 
     public function getPublicUrlAttribute()
     {
-        return asset('storage/' . $this->path);
+        $disk = env('FILESYSTEM_DISK', 'local');
+        if ($disk === 'public') {
+            return asset('storage/' . $this->path);
+        }
+        try {
+            if ($disk === 's3') {
+                $s3 = Storage::disk('s3');
+                return $s3->temporaryUrl($this->path, now()->addMinutes(10));
+            }
+        } catch (\Exception $e) {
+            \Log::error($e);
+            return null;
+        }
     }
 
     public function imageable()
