@@ -130,4 +130,24 @@ class LoanController extends ApiController
             return $this->error("Gagal mencatat pembayaran: " . $e->getMessage(), 500);
         }
     }
+
+    public function delete(Loan $loan)
+    {
+        DB::beginTransaction();
+
+        try {
+            $loan->transactions()->delete();
+            $loan->delete();
+
+            DB::commit();
+
+            return $this->success(null, "Pinjaman berhasil dihapus", 200);
+
+        } catch (Exception $e) {
+
+            DB::rollBack();
+
+            return $this->error("Gagal menghapus pinjaman: " . $e->getMessage(), 500);
+        }
+    }
 }

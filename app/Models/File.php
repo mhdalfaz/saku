@@ -15,6 +15,13 @@ class File extends Model
         'fileable_type',
     ];
 
+    protected $appends = ['public_url'];
+
+    public function getPublicUrlAttribute()
+    {
+        return asset('storage/' . $this->path);
+    }
+
     public function fileable()
     {
         return $this->morphTo();

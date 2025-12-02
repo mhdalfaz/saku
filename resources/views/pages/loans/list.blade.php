@@ -14,6 +14,20 @@
     {{-- Container daftar pinjaman --}}
     <div id="loansContainer" class="space-y-3"></div>
 
+
+    {{-- BladeUI Modal untuk konfirmasi hapus --}}
+    @section('modals')
+        <x-bladewind::modal name="deleteLoanModal" show_action_buttons="false">
+            <h3 class="text-lg font-bold mb-2">Konfirmasi Hapus Pinjaman</h3>
+            <p class="mb-4">Anda yakin ingin menghapus pinjaman ini? Data akan <span class="font-bold text-red-600">hilang
+                    permanen</span>!</p>
+            <div class="flex gap-2 justify-end">
+                <x-bladewind::button color="secondary" outline="true"
+                    onclick="closeDeleteModal()">Batal</x-bladewind::button>
+                <x-bladewind::button color="red" id="confirmDeleteBtn">Hapus</x-bladewind::button>
+            </div>
+        </x-bladewind::modal>
+    @endsection
 </x-layouts.menu>
 
 <script>
@@ -22,6 +36,7 @@
     const sortSelect = document.getElementById('sortDate');
 
     let loansData = [];
+    let currentDeleteId = null;
 
     async function loadLoans() {
         try {
@@ -36,7 +51,7 @@
             if (!res.ok) throw new Error(json.message || "Gagal memuat pinjaman");
 
             loansData = json.data;
-            renderLoans();
+            await renderLoans();
 
         } catch (err) {
             console.error(err);
@@ -55,11 +70,38 @@
         return new Date(dateString).toLocaleDateString("id-ID", options);
     }
 
-    function formatRupiah(number) {
-        return number.toLocaleString("id-ID");
+    function handleOpenDeleteModal(loanId) {
+        currentDeleteId = loanId;
+        // Buka modal dari BladeUI
+        showModal('deleteLoanModal');
+    }
+    function closeDeleteModal() {
+        currentDeleteId = null;
+        hideModal('deleteLoanModal');
     }
 
-    function renderLoans() {
+    async function handleDeleteLoan() {
+        if (!currentDeleteId) return;
+        try {
+            const token = localStorage.getItem("token");
+            const res = await fetch(`/api/loans/${currentDeleteId}`, {
+                method: "DELETE",
+                headers: { "Authorization": "Bearer " + token }
+            });
+            if (res.ok) {
+                await loadLoans();
+                closeDeleteModal();
+            } else {
+                const json = await res.json();
+                alert(json.message || "Gagal menghapus pinjaman.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Gagal menghapus pinjaman.");
+        }
+    }
+
+    async function renderLoans() {
         const filterText = filterInput.value.toLowerCase();
         const sortOrder = sortSelect.value;
 
@@ -75,7 +117,6 @@
                 : new Date(b.date) - new Date(a.date)
         );
 
-        // render
         loansContainer.innerHTML = filtered.map(l => {
             return `
                 <x-bladewind::card class="border rounded-md p-4 shadow-sm bg-white">
@@ -87,17 +128,15 @@
                             </div>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <x-bladewind::button size="tiny" onclick="window.location.href='/loans/${l.id}/pay'">Bayar</x-bladewind::button>
-                            <x-bladewind::button size="tiny" color="secondary" onclick="window.location.href='/loans/${l.id}'">Detail</x-bladewind::button>
+                            <x-bladewind::button size="tiny" color="secondary" outline="true" onclick="window.location.href='/loans/${l.id}/pay'">Bayar</x-bladewind::button>
+                            <x-bladewind::button size="tiny" color="secondary" outline="true" onclick="window.location.href='/loans/${l.id}'">Detail</x-bladewind::button>
+                            <x-bladewind::button size="tiny" color="red" onclick="handleOpenDeleteModal('${l.id}')">Delete</x-bladewind::button>
                         </div>
                     </div>
 
-
-                    <div class="text-3xl font-bold mb-2">Rp ${formatRupiah(l.total_amount)}</div>
-
-                    <div class="text-sm text-green-600">Sudah dibayar: Rp ${formatRupiah(l.paid)}</div>
-                    <div class="text-sm text-red-600 mb-2">Sisa: Rp ${formatRupiah(l.remaining)}</div>
-
+                    <div class="text-3xl font-bold mb-2">${formatIDR(l.total_amount)}</div>
+                    <div class="text-sm text-green-600">Sudah dibayar: <span class="font-bold">${formatIDR(l.paid)}</span></div>
+                    <div class="text-sm text-red-600 mb-2">Sisa: <span class="font-bold">${formatIDR(l.remaining)}</span></div>
                     <x-bladewind::progress-bar percentage="${l.percent}" color="green" />
                 </x-bladewind::card>
             `;
@@ -109,8 +148,13 @@
     }
 
     // Event filter & sort
-    filterInput.addEventListener('input', renderLoans);
-    sortSelect.addEventListener('change', renderLoans);
+    filterInput.addEventListener('input', async () => await renderLoans());
+    sortSelect.addEventListener('change', async () => await renderLoans());
+
+    // Event modal tombol hapus
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('confirmDeleteBtn').addEventListener('click', handleDeleteLoan);
+    });
 
     // load data saat halaman dibuka
     loadLoans();

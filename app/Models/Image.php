@@ -17,6 +17,13 @@ class Image extends Model
         'imageable_type',
     ];
 
+    protected $appends = ['public_url'];
+
+    public function getPublicUrlAttribute()
+    {
+        return asset('storage/' . $this->path);
+    }
+
     public function imageable()
     {
         return $this->morphTo();
