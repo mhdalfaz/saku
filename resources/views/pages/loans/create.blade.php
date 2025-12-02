@@ -40,6 +40,8 @@
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
             resetBladewindInputError();
+            const submitBtn = document.getElementById("submitBtn");
+            submitBtn.disabled = true;
 
             const token = localStorage.getItem("token");
             if (!token) return window.location.href = "/login";
@@ -84,6 +86,8 @@
             } catch (err) {
                 console.error(err);
                 alert("Terjadi kesalahan, coba lagi.");
+            } finally {
+                submitBtn.disabled = false;
             }
         });
     </script>
