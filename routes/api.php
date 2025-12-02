@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BorrowerController;
 use App\Http\Controllers\Api\LoanController;
+use App\Http\Controllers\Api\LoanTransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -16,11 +17,15 @@ Route::middleware('jwt')->group(function () {
     Route::get('/borrowers', [BorrowerController::class, 'getBorrowers']);
     Route::post('/borrowers', [BorrowerController::class, 'create']);
 
-    // make a group for loan routes
     Route::prefix('loans')->group(function () {
         Route::get('/', [LoanController::class, 'getLoans']);
         Route::post('/', [LoanController::class, 'create']);
         Route::get('/{loan}', [LoanController::class, 'detail']);
         Route::post('/{loan}/pay', [LoanController::class, 'pay']);
+        Route::delete('/{loan}', [LoanController::class, 'delete']);
+    });
+    
+    Route::prefix('loan-transactions')->group(function () {
+        Route::delete('/{loanTransaction}', [LoanTransactionController::class, 'delete']);
     });
 });
