@@ -24,3 +24,7 @@
 .alert-error {
     transform: translateY(-16px);
 }
+
+.custom-select {
+    background-image: none;
+}

@@ -9,16 +9,44 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\JWT;
 
 class LoanController extends ApiController
 {
     public function getLoans(Request $request)
     {
-        $user = JWTAuth::parseToken()->authenticate();
-        $loans = Loan::with(['borrower', 'transactions', 'files', 'images'])
-            ->where('user_id', $user->id)->get();
-        return $this->success($loans, "Daftar pinjaman berhasil diambil", 200);
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            $query = Loan::with(['borrower', 'transactions', 'files', 'images'])
+                ->where('user_id', $user->id);
+
+            if ($request->status === 'paid') {
+                // Filter: SUM of transactions >= total_amount
+                $query->whereHas('transactions', function ($q) {
+                    $q->select('loan_id') // Only select the grouping column
+                        ->groupBy('loan_id')
+                        ->havingRaw('SUM(amount) >= loans.total_amount');
+                });
+            } elseif ($request->status === 'unpaid') {
+                $query->where(function ($q) {
+                    // Case 1: No transactions at all
+                    $q->whereDoesntHave('transactions')
+                        // Case 2: Has transactions, but SUM < total_amount
+                        ->orWhereHas('transactions', function ($sub) {
+                            $sub->select('loan_id')
+                                ->groupBy('loan_id')
+                                ->havingRaw('SUM(amount) < loans.total_amount');
+                        });
+                });
+            }
+
+            $loans = $query->get();
+
+            return $this->success($loans, 'Daftar pinjaman berhasil diambil', 200);
+
+        } catch (Exception $e) {
+            return $this->error('Gagal mengambil data: ' . $e->getMessage(), 500);
+        }
     }
 
     public function create(Request $request, AttachmentService $attachmentService)
@@ -36,7 +64,7 @@ class LoanController extends ApiController
             ]);
 
             if ($validator->fails()) {
-                return $this->error("Validation error", 422, $validator->errors());
+                return $this->error('Validation error', 422, $validator->errors());
             }
 
             $user = JWTAuth::parseToken()->authenticate();
@@ -58,13 +86,13 @@ class LoanController extends ApiController
 
             DB::commit();
 
-            return $this->success($loan->load(['images', 'files']), "Pinjaman berhasil dibuat", 201);
+            return $this->success($loan->load(['images', 'files']), 'Pinjaman berhasil dibuat', 201);
 
         } catch (\Throwable $e) {
 
             DB::rollBack();
 
-            return $this->error("Gagal membuat pinjaman: " . $e->getMessage(), 500);
+            return $this->error('Gagal membuat pinjaman: ' . $e->getMessage(), 500);
         }
     }
 
@@ -83,11 +111,11 @@ class LoanController extends ApiController
             $loan->paid_amount = $paid;
             $loan->remaining_amount = $remaining;
 
-            return $this->success($loan, "Detail pinjaman berhasil diambil", 200);
+            return $this->success($loan, 'Detail pinjaman berhasil diambil', 200);
 
         } catch (Exception $e) {
 
-            return $this->error("Gagal mengambil detail pinjaman: " . $e->getMessage(), 500);
+            return $this->error('Gagal mengambil detail pinjaman: ' . $e->getMessage(), 500);
         }
     }
 
@@ -102,14 +130,14 @@ class LoanController extends ApiController
             ]);
 
             if ($validator->fails()) {
-                return $this->error("Validation error", 422, $validator->errors());
+                return $this->error('Validation error', 422, $validator->errors());
             }
 
             $paid = $loan->transactions()->sum('amount');
             $remaining = $loan->total_amount - $paid;
 
             if ($request->amount > $remaining) {
-                return $this->error("Pembayaran melebihi sisa pinjaman", 422);
+                return $this->error('Pembayaran melebihi sisa pinjaman', 422);
             }
 
             $loan->transactions()->create([
@@ -121,13 +149,13 @@ class LoanController extends ApiController
 
             DB::commit();
 
-            return $this->success(null, "Pembayaran berhasil dicatat", 201);
+            return $this->success(null, 'Pembayaran berhasil dicatat', 201);
 
         } catch (Exception $e) {
 
             DB::rollBack();
 
-            return $this->error("Gagal mencatat pembayaran: " . $e->getMessage(), 500);
+            return $this->error('Gagal mencatat pembayaran: ' . $e->getMessage(), 500);
         }
     }
 
@@ -141,13 +169,13 @@ class LoanController extends ApiController
 
             DB::commit();
 
-            return $this->success(null, "Pinjaman berhasil dihapus", 200);
+            return $this->success(null, 'Pinjaman berhasil dihapus', 200);
 
         } catch (Exception $e) {
 
             DB::rollBack();
 
-            return $this->error("Gagal menghapus pinjaman: " . $e->getMessage(), 500);
+            return $this->error('Gagal menghapus pinjaman: ' . $e->getMessage(), 500);
         }
     }
 }
