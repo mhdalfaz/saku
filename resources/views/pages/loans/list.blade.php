@@ -3,36 +3,38 @@
     <h1 class="text-2xl font-bold mb-4">Daftar Pinjaman</h1>
 
     {{-- Filter --}}
-    <div class="flex items-center gap-4 mb-4">
-        <input type="text" id="filterName" placeholder="Cari peminjam..." class="border rounded px-3 py-2 flex-1" />
-        <select id="sortDate" class="custom-select border rounded px-3 py-2">
-            <option value="desc">Terbaru</option>
-            <option value="asc">Terlama</option>
-        </select>
-        <select id="filterStatus" class="custom-select border rounded px-3 py-2">
-            <option value="">Semua</option>
-            <option value="paid">Lunas</option>
-            <option value="unpaid">Belum Lunas</option>
-        </select>
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 mb-4">
+        <input type="text" id="filterName" placeholder="Cari peminjam..." class="border rounded px-3 py-2 w-full sm:flex-1" />
+        <div class="flex gap-2 w-full">
+            <select id="sortDate" class="custom-select border rounded px-3 py-2 flex-1 w-full">
+                <option value="desc">Terbaru</option>
+                <option value="asc">Terlama</option>
+            </select>
+            <select id="filterStatus" class="custom-select border rounded px-3 py-2 flex-1 w-full">
+                <option value="">Semua</option>
+                <option value="paid">Lunas</option>
+                <option value="unpaid">Belum Lunas</option>
+            </select>
+        </div>
     </div>
 
     {{-- Summary Cards --}}
-    <div class="flex gap-4 mb-4">
-        <div class="flex-1 bg-white border rounded-lg p-4">
-            <div class="text-sm font-medium">Total Lunas</div>
-            <div class="flex items-baseline gap-2">
+    <div class="grid grid-cols-2 gap-2 mb-4">
+        <div class="bg-white border rounded-lg p-4">
+            <div class="text-sm font-medium min-h-10">Total Lunas</div>
+            <div class="flex items-center gap-2">
                 <span id="paidCount" class="text-2xl font-bold ">-</span>
                 <span class="text-sm">pinjaman</span>
             </div>
-            <div class="text-green-600 text-sm">Total: <span id="paidTotal" class="font-semibold">-</span></div>
+            <div class="text-green-600 text-sm"><span id="paidTotal" class="font-semibold">-</span></div>
         </div>
-        <div class="flex-1 bg-white border rounded-lg p-4">
-            <div class="text-sm font-medium">Total Belum Lunas</div>
-            <div class="flex items-baseline gap-2">
+        <div class="bg-white border rounded-lg p-4">
+            <div class="text-sm font-medium min-h-10">Total Belum Lunas</div>
+            <div class="flex items-center gap-2">
                 <span id="unpaidCount" class="text-2xl font-bold ">-</span>
                 <span class="text-sm">pinjaman</span>
             </div>
-            <div class="text-red-600 text-sm">Total: <span id="unpaidTotal" class="font-semibold">-</span></div>
+            <div class="text-red-600 text-sm"><span id="unpaidTotal" class="font-semibold">-</span></div>
         </div>
     </div>
 
@@ -83,14 +85,6 @@
             if (!res.ok) throw new Error(json.message || "Gagal memuat pinjaman");
 
             loansData = json.data;
-
-            const paidLoans = loansData.filter(l => l.remaining === 0);
-            const unpaidLoans = loansData.filter(l => l.remaining > 0);
-
-            document.getElementById('paidCount').textContent = paidLoans.length;
-            document.getElementById('paidTotal').textContent = formatIDR(paidLoans.reduce((sum, l) => sum + l.paid, 0));
-            document.getElementById('unpaidCount').textContent = unpaidLoans.length;
-            document.getElementById('unpaidTotal').textContent = formatIDR(unpaidLoans.reduce((sum, l) => sum + l.remaining, 0));
 
             await renderLoans();
 
@@ -162,6 +156,14 @@
                 ? new Date(a.date) - new Date(b.date)
                 : new Date(b.date) - new Date(a.date)
         );
+
+        // update summary cards
+        const paidLoans = filtered.filter(l => l.remaining === 0);
+        const unpaidLoans = filtered.filter(l => l.remaining > 0);
+        document.getElementById('paidCount').textContent = paidLoans.length;
+        document.getElementById('paidTotal').textContent = formatIDR(paidLoans.reduce((sum, l) => sum + l.paid, 0));
+        document.getElementById('unpaidCount').textContent = unpaidLoans.length;
+        document.getElementById('unpaidTotal').textContent = formatIDR(unpaidLoans.reduce((sum, l) => sum + l.remaining, 0));
 
         loansContainer.innerHTML = filtered.map(l => {
             return `
