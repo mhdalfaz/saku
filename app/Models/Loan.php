@@ -19,7 +19,7 @@ class Loan extends Model
 
     public function getPaidAttribute()
     {
-        return $this->transactions()->sum('amount');
+        return (int) $this->transactions()->sum('amount');
     }
 
     public function getRemainingAttribute()
@@ -32,6 +32,7 @@ class Loan extends Model
         if ($this->total_amount == 0) {
             return 0;
         }
+
         return round(($this->paid / $this->total_amount) * 100, 2);
     }
 
