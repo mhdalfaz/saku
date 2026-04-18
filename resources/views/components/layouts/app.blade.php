@@ -15,7 +15,7 @@
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-gray-100 text-gray-900 overflow-x-hidden">
 
     {{-- Desktop Navbar --}}
     <div id="desktopNav">
@@ -24,7 +24,7 @@
 
     <div class="flex w-full">
         {{-- Content --}}
-        <main class="flex-1 p-6">
+        <main class="flex-1 p-6 overflow-x-hidden">
             <div class="max-w-xl mx-auto space-y-6">
                 {{ $slot }}
             </div>

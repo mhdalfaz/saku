@@ -1,6 +1,6 @@
 <x-layouts.auth title="Login">
 
-    <div class="flex justify-center items-center min-h-screen">
+    <div class="flex justify-center items-center min-h-[calc(100vh-3rem)]">
         <div class="w-full max-w-sm bg-white p-6 rounded-xl shadow">
 
             <h1 class="text-xl font-bold mb-4 text-center">Masuk ke Saku</h1>
