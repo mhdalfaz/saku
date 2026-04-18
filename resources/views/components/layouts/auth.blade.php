@@ -15,8 +15,8 @@
     <script src="//unpkg.com/alpinejs" defer></script>
 </head>
 
-<body class="bg-gray-100 text-gray-900">
-    <div class="flex w-full">
+<body class="bg-gray-100 text-gray-900 overflow-x-hidden">
+    <div class="flex w-full overflow-x-hidden">
         {{-- Content --}}
         <main class="flex-1 p-6">
             {{ $slot }}

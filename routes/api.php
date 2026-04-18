@@ -23,8 +23,9 @@ Route::middleware('jwt')->group(function () {
         Route::get('/{loan}', [LoanController::class, 'detail']);
         Route::post('/{loan}/pay', [LoanController::class, 'pay']);
         Route::delete('/{loan}', [LoanController::class, 'delete']);
+        Route::get('/borrower/{borrower}', [LoanController::class, 'getLoansByBorrower']);
     });
-    
+
     Route::prefix('loan-transactions')->group(function () {
         Route::delete('/{loanTransaction}', [LoanTransactionController::class, 'delete']);
     });

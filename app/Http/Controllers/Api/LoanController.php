@@ -75,6 +75,7 @@ class LoanController extends ApiController
                 'total_amount' => $request->amount,
                 'date' => $request->date,
                 'description' => $request->note,
+                'status' => 'ongoing',
             ]);
 
             // ================================
@@ -147,6 +148,13 @@ class LoanController extends ApiController
                 'note' => $request->note,
             ]);
 
+            // Check if loan is fully paid
+            $newTotalPaid = $paid + $request->amount;
+            if ($newTotalPaid >= $loan->total_amount) {
+                $loan->status = 'paid';
+                $loan->save();
+            }
+
             DB::commit();
 
             return $this->success(null, 'Pembayaran berhasil dicatat', 201);
@@ -176,6 +184,51 @@ class LoanController extends ApiController
             DB::rollBack();
 
             return $this->error('Gagal menghapus pinjaman: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function getLoansByBorrower(Request $request, $borrower)
+    {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+
+            $query = Loan::with(['borrower', 'transactions'])
+                ->where('user_id', $user->id)
+                ->where('borrower_id', $borrower)
+                ->orderBy('date', 'asc');
+
+            $status = $request->status;
+            if ($status === 'ongoing') {
+                $query->whereDoesntHave('transactions', function ($q) {
+                    $q->select('loan_id')
+                        ->groupBy('loan_id')
+                        ->havingRaw('SUM(amount) >= loans.total_amount');
+                });
+            } elseif ($status === 'paid') {
+                $query->whereHas('transactions', function ($q) {
+                    $q->select('loan_id')
+                        ->groupBy('loan_id')
+                        ->havingRaw('SUM(amount) >= loans.total_amount');
+                });
+            }
+
+            $loans = $query->get();
+
+            $loans->each(function ($loan) {
+                $paid = $loan->transactions->sum('amount');
+                $loan->paid_amount = $paid;
+                $loan->remaining_amount = $loan->total_amount - $paid;
+                $loan->paid = $paid;
+                $loan->remaining = $loan->total_amount - $paid;
+                $loan->percent = $loan->total_amount > 0
+                    ? floor(($paid / $loan->total_amount) * 100)
+                    : 0;
+            });
+
+            return $this->success($loans, 'Daftar pinjaman peminjam berhasil diambil', 200);
+
+        } catch (Exception $e) {
+            return $this->error('Gagal mengambil data: ' . $e->getMessage(), 500);
         }
     }
 }

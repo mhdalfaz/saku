@@ -4,7 +4,8 @@
 
     {{-- Filter --}}
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4 mb-4">
-        <input type="text" id="filterName" placeholder="Cari peminjam..." class="border rounded px-3 py-2 w-full sm:flex-1" />
+        <input type="text" id="filterName" placeholder="Cari peminjam..."
+            class="border rounded px-3 py-2 w-full sm:flex-1" />
         <div class="flex gap-2 w-full">
             <select id="sortDate" class="custom-select border rounded px-3 py-2 flex-1 w-full">
                 <option value="desc">Terbaru</option>
@@ -166,6 +167,11 @@
         document.getElementById('unpaidTotal').textContent = formatIDR(unpaidLoans.reduce((sum, l) => sum + l.remaining, 0));
 
         loansContainer.innerHTML = filtered.map(l => {
+            const isPaid = l.status === 'paid' || l.remaining === 0;
+            const payButton = isPaid
+                ? ''
+                : `<x-bladewind::button size="tiny" color="secondary" outline="true" onclick="window.location.href='/loans/${l.id}/pay'">Bayar</x-bladewind::button>`;
+
             return `
                 <x-bladewind::card class="border rounded-md p-4 shadow-sm bg-white">
                     <div class="flex justify-between items-start">
@@ -176,7 +182,7 @@
                             </div>
                         </div>
                         <div class="flex flex-col gap-1">
-                            <x-bladewind::button size="tiny" color="secondary" outline="true" onclick="window.location.href='/loans/${l.id}/pay'">Bayar</x-bladewind::button>
+                            ${payButton}
                             <x-bladewind::button size="tiny" color="secondary" outline="true" onclick="window.location.href='/loans/${l.id}'">Detail</x-bladewind::button>
                             <x-bladewind::button size="tiny" color="red" onclick="handleOpenDeleteModal('${l.id}')">Delete</x-bladewind::button>
                         </div>

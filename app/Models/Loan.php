@@ -13,6 +13,7 @@ class Loan extends Model
         'date',
         'due_date',
         'description',
+        'status',
     ];
 
     protected $appends = ['paid', 'remaining', 'percent'];

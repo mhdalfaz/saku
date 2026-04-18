@@ -10,6 +10,11 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
+/* Prevent horizontal scroll on mobile */
+html, body {
+    overflow-x: hidden;
+}
+
 /* Desktop navbar hidden di mobile */
 #desktopNav {
     display: none;
@@ -27,4 +32,12 @@
 
 .custom-select {
     background-image: none;
+}
+
+.grow.number {
+    margin: 0px !important;
+}
+
+div:has(> .figure.tracking-wider) {
+    font-size: 20px !important;
 }
