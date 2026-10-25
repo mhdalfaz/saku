@@ -24,6 +24,16 @@
             </div>
         </a>
 
+        {{-- Savings --}}
+        <a href="/savings/create"
+            class="block bg-white border border-gray-200 rounded-md p-6 shadow-sm hover:shadow-md transition flex items-center gap-4">
+            <x-bladewind.icon name="archive-box" class="w-10 h-10 text-gray-700" />
+            <div>
+                <h2 class="text-lg font-semibold text-gray-800">Simpanan</h2>
+                <p class="text-sm text-gray-500">Catat uang yang disimpan di orang lain</p>
+            </div>
+        </a>
+
     </div>
 
 </x-layouts.menu>
