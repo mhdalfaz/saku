@@ -26,11 +26,24 @@ Route::get('/settings', function () {
 // loans group
 Route::prefix('loans')->name('loans.')->group(function () {
     Route::get('/create', [LoanController::class, 'createPage'])->name('create.page');
-    Route::get('/', function() {
+    Route::get('/', function () {
         return view('pages.loans.list');
     })->name('list.page');
-    Route::get('/{loan}', function() {
+    Route::get('/{loan}', function () {
         return view('pages.loans.detail');
     })->name('payment.page');
     Route::get('/{loan}/pay', [LoanController::class, 'paymentPage'])->name('payment.page');
+});
+
+// savings group
+Route::prefix('savings')->name('savings.')->group(function () {
+    Route::get('/create', function () {
+        return view('pages.savings.create');
+    })->name('create.page');
+    Route::get('/', function () {
+        return view('pages.savings.list');
+    })->name('list.page');
+    Route::get('/{saving}', function () {
+        return view('pages.savings.detail');
+    })->name('detail.page');
 });

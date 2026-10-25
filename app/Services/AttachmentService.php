@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Storage;
-
 class AttachmentService
 {
     protected $disk;
@@ -13,17 +11,17 @@ class AttachmentService
         $this->disk = env('FILESYSTEM_DISK', 'local');
     }
 
-    public function handleAttachments($loan, $files)
+    public function handleAttachments($model, $files, string $directory = 'uploads/loans')
     {
         foreach ($files as $file) {
 
             $mime = $file->getMimeType();
-            $path = $file->store('uploads/loans', $this->disk);
+            $path = $file->store($directory, $this->disk);
             if (str_starts_with($mime, 'image/')) {
 
                 $imageInfo = getimagesize($file);
 
-                $loan->images()->create([
+                $model->images()->create([
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $mime,
@@ -34,7 +32,7 @@ class AttachmentService
 
             } else {
 
-                $loan->files()->create([
+                $model->files()->create([
                     'path' => $path,
                     'original_name' => $file->getClientOriginalName(),
                     'mime_type' => $mime,
